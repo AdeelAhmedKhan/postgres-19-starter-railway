@@ -115,3 +115,30 @@ image build failed and is recorded honestly: the volume was
 still mounted at the pre-18 path `/var/lib/postgresql/data`,
 which the current official image refuses; the mount is now
 `/var/lib/postgresql`, as this template ships it.
+Feature verification, 2026-11-20: TLS, dump import, and
+scheduled backups were each verified on live deploys of the
+feature build, and the test projects were deleted afterwards.
+TLS: an `sslmode=require` connection through the public proxy
+negotiated TLS 1.3, plain connections were upgraded or
+accepted as configured, and a wrong password was rejected.
+Dump import: a deploy with `POSTGRES_INIT_DUMP_BASE64` set
+created the imported table with its row present, confirmed by
+querying the database, not only the logs. Backups: the cron
+service produced verified dumps in the project bucket on
+repeated runs, and a restore drill passed end to end: the
+newest scheduled dump was downloaded and restored with
+`pg_restore` into a fresh database, where the data planted
+before the backup was present and the restored `vector`
+extension answered a distance query. Three defects were found
+by these live tests and fixed, and are recorded here so the
+fixes are not lost: the import script must connect over the
+local socket during init (the template's `PGHOST` points at
+the private domain, which refuses connections at init time);
+the generated password uses a URL-safe alphabet only, because
+a `/` from the base64 alphabet corrupts the connection
+strings the password is embedded in; and the bucket name
+must be wired from the bucket's `BUCKET` variable, which is
+the real S3 bucket name, not `RAILWAY_BUCKET_NAME`, which is
+the display name and made every upload fail with
+NoSuchBucket. Backups remain scheduled dumps, not
+point-in-time recovery.
