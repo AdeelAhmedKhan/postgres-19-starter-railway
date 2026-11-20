@@ -73,7 +73,7 @@ echo "rows survive restart: $AFTER"
 cat > "$EVIDENCE" <<EOF
 {
   "template": "PostgreSQL 19 + pgvector",
-  "image": "own build: debian:trixie-slim + PGDG postgresql-19 / postgresql-19-pgvector",
+  "image": "official postgres:19.0 image + PGDG postgresql-19-pgvector (parity runs the same PGDG packages directly)",
   "date": "2026-11-20",
   "version": "$VERSION",
   "pgvector": "$EXTVERSION",

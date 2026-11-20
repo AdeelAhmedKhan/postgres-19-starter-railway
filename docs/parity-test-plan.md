@@ -9,7 +9,12 @@ preparation only. Never ship an RC.
    announcement. (Updated 2026-11-20: GA landed 19 Nov 2026.
    Docker Hub's official image is NOT part of the gate anymore;
    this template builds its own image from PGDG packages on
-   Ahmed's instruction, so a missing Docker tag does not block.)
+   Ahmed's instruction, so a missing Docker tag does not block.
+   Update 2026-11-20, later the same day: the Docker Hub tags
+   landed and the template moved onto the official postgres:19.0
+   image (digest pinned) with pgvector still from PGDG, on
+   Ahmed's approval. The parity evidence below stands: the
+   packages under test are the same PGDG builds.)
 2. **Install the PGDG packages.** Add apt.postgresql.org for
    this distro and install the pinned versions the Dockerfile
    uses (postgresql-19, postgresql-19-pgvector). Confirm the

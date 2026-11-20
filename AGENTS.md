@@ -23,28 +23,28 @@ standalone PG19 on the marketplace.
 
 ## Stack (pinned — do not bump majors casually)
 
-- PostgreSQL **19.0** + **pgvector 0.8.7**, in our own image:
-  `debian:trixie-slim` plus the pinned PGDG apt packages
-  (`postgresql-19=19.0-1.pgdg13+1`,
-  `postgresql-19-pgvector=0.8.7-1.pgdg13+2`). PGDG is the
-  PostgreSQL project's own packaging and the same source the
-  official Docker image is built from.
-- Why not the official `postgres:19.0` image: it did not exist
-  when PG19 went GA on 19 Nov 2026 (Docker Hub tags `19` and
-  `19.0` still 404 on 2026-11-20). Ahmed's standing instruction
-  for release-gap templates (2026-11-20): build our own image,
-  never wait for official images while a version is already
-  released. The release window is the whole value of the gap play.
-- When the official image eventually lands, this template does
-  NOT automatically move to it: the PGDG build is equivalent in
-  provenance and already published. Revisit only if the official
-  image gains something this build lacks.
-- No app code, no driver, no framework lives here. The only code
-  is the entrypoint, one init SQL file, and the local parity
-  test in `scripts/`.
-- Volume: `/var/lib/postgresql/data` (this image sets PGDATA
-  there itself; the path is ours, not inherited from the
-  official image's layout).
+- PostgreSQL **19.0** + **pgvector 0.8.7**. Base is the official
+  `postgres:19.0` image, pinned by tag and amd64 digest
+  (sha256:d2c8a7d3...). pgvector comes from PGDG, the PostgreSQL
+  project's own apt repository, which the official image already
+  has configured and scoped to PostgreSQL 19; the package is
+  pinned exactly (`postgresql-19-pgvector=0.8.7-1.pgdg13+2`).
+- History: the template first shipped on 2026-11-20 with its own
+  `debian:trixie-slim` + PGDG image, because the official image
+  did not exist when PG19 went GA on 19 Nov 2026 (Ahmed's
+  standing instruction: build our own, never wait for official
+  images while a version is released). The Docker Hub tags
+  landed on 2026-11-20 and Ahmed approved moving to the official
+  image the same day, judging it better on trust and patch
+  cadence; the PostgreSQL and pgvector packages underneath are
+  the same PGDG builds either way. The custom entrypoint was
+  retired with the switch; the official entrypoint runs the
+  init SQL in `/docker-entrypoint-initdb.d`.
+- No app code, no driver, no framework lives here. The only
+  code is one init SQL file and the local parity test in
+  `scripts/`.
+- Volume: `/var/lib/postgresql/data` (the official image's
+  PGDATA path; the template mounts its volume there).
 
 ## The one rule that matters
 
