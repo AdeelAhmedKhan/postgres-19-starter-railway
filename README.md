@@ -70,5 +70,16 @@ TCP was rejected. The local test ran the Ubuntu PGDG packages;
 the image uses the Debian (trixie) packages from the same
 repository, which is also where the official base image gets
 its PostgreSQL.
-Live Railway deploy status: see the template page; this README
-is updated when a live deploy has been verified.
+Live Railway verification, 2026-11-20: a fresh deploy of this
+template was verified end to end and the test project deleted
+afterwards. The deploy logs showed the init process completing
+and "database system is ready to accept connections", and an
+authenticated connection over the TCP proxy confirmed
+PostgreSQL 19.0 (Debian 19.0-1.pgdg13+1), the `vector`
+extension at 0.8.7 already created in the application database,
+a nearest-neighbour query returning the correct ordering, and
+a wrong password rejected. The first live test of the official
+image build failed and is recorded honestly: the volume was
+still mounted at the pre-18 path `/var/lib/postgresql/data`,
+which the current official image refuses; the mount is now
+`/var/lib/postgresql`, as this template ships it.
