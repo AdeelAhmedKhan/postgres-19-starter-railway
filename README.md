@@ -34,6 +34,21 @@ nothing about those.
   already run in your application database
 - SCRAM-SHA-256 password authentication; a wrong password is
   rejected, verified in testing
+- TLS on by default: the server generates a self-signed
+  certificate on first start (kept on the volume, so it survives
+  restarts) and accepts encrypted connections with
+  `sslmode=require`. Set `PG_SSL=off` to disable it. Plain
+  connections keep working either way.
+- Optional first-boot dump import: point
+  `POSTGRES_INIT_DUMP_URL` at a `.sql` or `.sql.gz` dump, or
+  paste one base64-encoded in `POSTGRES_INIT_DUMP_BASE64`, and
+  it is applied once, on the first start against an empty data
+  directory. A broken dump fails the first boot loudly instead
+  of leaving a half-imported database behind.
+- Scheduled backups: a small cron service runs `pg_dump` daily
+  at 03:15 UTC into a Railway Bucket in the same project,
+  verifies each archive is readable before uploading, and keeps
+  the newest 14 dumps (`BACKUP_RETENTION_COUNT`).
 - A persistent volume at `/var/lib/postgresql` (the image keeps data in its versioned subdirectory, `19/docker`)
 - The official image's variable contract: `POSTGRES_USER`,
   `POSTGRES_PASSWORD`, `POSTGRES_DB`
@@ -45,17 +60,34 @@ nothing about those.
 | `POSTGRES_USER` | `postgres` unless you change it |
 | `POSTGRES_PASSWORD` | Generated at deploy time by the template |
 | `POSTGRES_DB` | `railway` unless you change it |
+| `PG_SSL` | `on` by default; `off` disables TLS |
+| `POSTGRES_INIT_DUMP_URL` | Optional; empty means no import |
+| `POSTGRES_INIT_DUMP_BASE64` | Optional; empty means no import |
+| `BACKUP_RETENTION_COUNT` | `14` on the backup service |
 
 Connect from another service in the same project with the
 reference variable `PGURL`, or from outside through the TCP
-proxy the template enables on port 5432.
+proxy the template enables on port 5432. For an encrypted
+connection add `?sslmode=require` to the connection string;
+the certificate is self-signed, so `sslmode=verify-full`
+cannot validate it.
+
+Restoring a backup: download a dump from the bucket and run
+`pg_restore` into the target database. The backup service's
+logs list every archive it uploads.
 
 ## Honest scope
 
 - Single node. No replication, high availability, or failover.
-- No backups. Snapshot the volume or run `pg_dump` on a schedule.
-- No TLS inside the container. Prefer Railway's private network
-  for service-to-service traffic.
+- Backups are scheduled `pg_dump` archives, **not**
+  point-in-time recovery: a restore lands at the moment of the
+  dump, not at an arbitrary moment between dumps.
+- TLS uses a self-signed certificate, the same trade Railway's
+  own SSL Postgres image makes. It encrypts traffic; it does
+  not prove the server's identity to a verifying client.
+- No major-version auto upgrade. Moving to a future major
+  version is a dump and restore; the scheduled backups make
+  that a routine operation rather than an emergency.
 - Patch releases (19.1 and later) arrive when the version pins
   in the Dockerfile are bumped, not silently. Watch the repo.
 

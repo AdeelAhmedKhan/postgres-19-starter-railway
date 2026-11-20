@@ -40,9 +40,21 @@ standalone PG19 on the marketplace.
   the same PGDG builds either way. The custom entrypoint was
   retired with the switch; the official entrypoint runs the
   init SQL in `/docker-entrypoint-initdb.d`.
-- No app code, no driver, no framework lives here. The only
-  code is one init SQL file and the local parity test in
-  `scripts/`.
+- No app code, no driver, no framework lives here. The code is
+  the init files in `initdb.d/`, the TLS entrypoint wrapper, the
+  backup service in `services/backup/`, and the local parity
+  test in `scripts/`.
+- Feature build (2026-11-20, Ahmed's call): TLS on by default
+  via `docker-entrypoint-wrapper.sh` (self-signed certificate on
+  the volume, `PG_SSL=off` disables); first-boot dump import
+  via `initdb.d/20-import-dump.sh` (`POSTGRES_INIT_DUMP_URL` /
+  `POSTGRES_INIT_DUMP_BASE64`); scheduled pg_dump backups to a
+  Railway Bucket via `services/backup/` (daily cron, retention
+  count, archive verified readable before upload). Backups are
+  scheduled dumps, NEVER point-in-time recovery, and the
+  feature may only be claimed after a restore drill passes on a
+  live deploy. Auto upgrade stays out until the PostgreSQL 20
+  cycle; the upgrade path is dump and restore.
 - Volume: `/var/lib/postgresql`. Since PostgreSQL 18 the
   official image keeps data in a major-version subdirectory
   (`19/docker`) under that mount. NEVER mount the volume at the
@@ -75,6 +87,15 @@ these is true in the README and in every test report.
   parity test script does not.
 - `.env.example` — variable names only, placeholders only. Never put
   a real password here, in tests, or in example files.
+- `docker-entrypoint-wrapper.sh` — generates the self-signed
+  TLS certificate on first start and starts the server with
+  `ssl=on`, then execs the official entrypoint.
+- `initdb.d/10-pgvector.sql` — creates the vector extension at
+  first start. `initdb.d/20-import-dump.sh` — applies the
+  optional user dump at first start (see its header).
+- `services/backup/` — the backup cron service: its own
+  Dockerfile (same pinned base plus the AWS CLI) and
+  `backup.sh` (dump, verify, upload, prune).
 - `scripts/local-test.sh` — installs the pinned PGDG packages
   (PostgreSQL 19 + pgvector) if missing, starts a scratch
   cluster on /tmp, sets a runtime generated password, runs the
