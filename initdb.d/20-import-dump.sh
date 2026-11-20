@@ -41,5 +41,12 @@ else
 fi
 
 echo "pg19-template: importing dump into database ${POSTGRES_DB}"
-psql -v ON_ERROR_STOP=1 --username "${POSTGRES_USER}" --dbname "${POSTGRES_DB}" -f "${DUMP_FILE}"
+# Connect through the local unix socket, explicitly. The
+# template sets PGHOST to the service's private domain as a
+# convenience for other services, and that variable is also
+# present in this container's environment; during init the
+# temporary server listens only on the local socket, so a TCP
+# connection to the private domain is refused (proven by the
+# first live feature test, 2026-11-20).
+PGHOST=/var/run/postgresql psql -v ON_ERROR_STOP=1 --username "${POSTGRES_USER}" --dbname "${POSTGRES_DB}" -f "${DUMP_FILE}"
 echo "pg19-template: dump import complete"
