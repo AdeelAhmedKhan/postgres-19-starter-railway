@@ -12,7 +12,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres-19-data:/var/lib/postgresql/data
+      - postgres-19-data:/var/lib/postgresql
     restart: "no"
 
 volumes:

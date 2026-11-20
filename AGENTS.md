@@ -43,8 +43,13 @@ standalone PG19 on the marketplace.
 - No app code, no driver, no framework lives here. The only
   code is one init SQL file and the local parity test in
   `scripts/`.
-- Volume: `/var/lib/postgresql/data` (the official image's
-  PGDATA path; the template mounts its volume there).
+- Volume: `/var/lib/postgresql`. Since PostgreSQL 18 the
+  official image keeps data in a major-version subdirectory
+  (`19/docker`) under that mount. NEVER mount the volume at the
+  old `/var/lib/postgresql/data` path with the official image:
+  its entrypoint detects the stale layout and refuses to start
+  (live test failure, 2026-11-20). Our retired custom image set
+  PGDATA itself, which is why the old path worked with it.
 
 ## The one rule that matters
 

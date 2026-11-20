@@ -34,7 +34,7 @@ nothing about those.
   already run in your application database
 - SCRAM-SHA-256 password authentication; a wrong password is
   rejected, verified in testing
-- A persistent volume at `/var/lib/postgresql/data`
+- A persistent volume at `/var/lib/postgresql` (the image keeps data in its versioned subdirectory, `19/docker`)
 - The official image's variable contract: `POSTGRES_USER`,
   `POSTGRES_PASSWORD`, `POSTGRES_DB`
 
