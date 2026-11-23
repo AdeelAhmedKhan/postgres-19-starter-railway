@@ -1,5 +1,5 @@
 {
- "_note": "Transcription of the exact Railway Template Composer settings for the PostgreSQL 19 + pgvector template. Railway does NOT read this file automatically: enter these settings in the Template Composer when publishing, and check the published page against this file. The Postgres service builds from the GitHub repo's Dockerfile, which starts from the official postgres:19.0 image (pinned by digest) and adds pgvector from PGDG. The Backup service builds from services/backup/Dockerfile in the same repo.",
+ "_note": "Transcription of the exact Railway Template Composer settings for the PostgreSQL 19 + pgvector template. Railway does NOT read this file automatically: enter these settings in the Template Composer when publishing, and check the published page against this file. The Postgres service builds from the GitHub repo's Dockerfile, which uses the pgvector project's official image (pgvector/pgvector:0.8.7-pg19-trixie, pinned by digest): PostgreSQL 19.0 with pgvector 0.8.7 built in. The Backup service builds from services/backup/Dockerfile in the same repo.",
  "category": "Storage",
  "category_note": "Railway's category list has no 'Database' option (checked 2026-11-03); Storage is the closest available filing.",
  "description": "PostgreSQL 19 + pgvector, with SSL and scheduled backups",
@@ -19,7 +19,7 @@
    "publicNetworking": false,
    "restartPolicy": "ON_FAILURE",
    "source": {
-    "note": "Builds the repo Dockerfile (official postgres:19.0 base, digest pinned, plus the pinned PGDG pgvector package).",
+    "note": "Builds the repo Dockerfile (pgvector/pgvector:0.8.7-pg19-trixie base, digest pinned).",
     "repo": "AdeelAhmedKhan/postgres-19-starter-railway"
    },
    "tcpProxy": {

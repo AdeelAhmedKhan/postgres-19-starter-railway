@@ -23,12 +23,14 @@ standalone PG19 on the marketplace.
 
 ## Stack (pinned — do not bump majors casually)
 
-- PostgreSQL **19.0** + **pgvector 0.8.7**. Base is the official
-  `postgres:19.0` image, pinned by tag and amd64 digest
-  (sha256:d2c8a7d3...). pgvector comes from PGDG, the PostgreSQL
-  project's own apt repository, which the official image already
-  has configured and scoped to PostgreSQL 19; the package is
-  pinned exactly (`postgresql-19-pgvector=0.8.7-1.pgdg13+2`).
+- PostgreSQL **19.0** + **pgvector 0.8.7**. Base is the pgvector
+  project's official image, `pgvector/pgvector:0.8.7-pg19-trixie`,
+  pinned by tag and amd64 digest
+  (sha256:454ef817...): PostgreSQL 19.0 with pgvector 0.8.7 built
+  in by the pgvector team. Ahmed's call 2026-11-23: for a template
+  other people deploy, trust beats ownership; the pgvector team's
+  image is the more trustworthy base, and the swap removes our own
+  PGDG install step.
 - History: the template first shipped on 2026-11-20 with its own
   `debian:trixie-slim` + PGDG image, because the official image
   did not exist when PG19 went GA on 19 Nov 2026 (Ahmed's
@@ -39,7 +41,10 @@ standalone PG19 on the marketplace.
   cadence; the PostgreSQL and pgvector packages underneath are
   the same PGDG builds either way. The custom entrypoint was
   retired with the switch; the official entrypoint runs the
-  init SQL in `/docker-entrypoint-initdb.d`.
+  init SQL in `/docker-entrypoint-initdb.d`. On 2026-11-23 the
+  base moved again, to the pgvector project's image (same
+  entrypoint lineage, so the init and volume contracts are
+  unchanged); see the Stack bullet above for the rationale.
 - No app code, no driver, no framework lives here. The code is
   the init files in `initdb.d/`, the TLS entrypoint wrapper, the
   backup service in `services/backup/`, and the local parity

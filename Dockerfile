@@ -1,28 +1,29 @@
 # syntax=docker/dockerfile:1
-# PostgreSQL 19 + pgvector — the official PostgreSQL 19 image
-# with pgvector added from PGDG, the PostgreSQL project's own
-# apt repository (already configured inside the official image,
-# scoped to PostgreSQL 19). Versions are pinned exactly below; a
-# patch release (19.1, pgvector 0.8.8) is a deliberate bump of
-# those pins, never a silent drift.
+# PostgreSQL 19 + pgvector — the pgvector project's official
+# image: PostgreSQL 19.0 with pgvector 0.8.7 built in by the
+# team that maintains pgvector, pinned by tag and digest below.
+# The template's own extras (TLS wrapper, init scripts) layer
+# on top; nothing else is added to the database image.
 #
-# History: this template first shipped on 2026-11-20 with its own
-# debian + PGDG image, because the official postgres:19 image did
-# not exist yet when PostgreSQL 19 went GA on 2026-11-19. It
-# moved to the official image the day the Docker Hub tags landed
-# (2026-11-20), keeping the same pgvector pin. Same PGDG packages
-# underneath either way; the official base is the better
-# maintained and more recognisable starting point.
+# History: this template first shipped on 2026-11-20 with its
+# own debian + PGDG image, because the official postgres:19
+# image did not exist yet when PostgreSQL 19 went GA on
+# 2026-11-19. It moved to the official postgres image the day
+# the Docker Hub tags landed (2026-11-20), adding pgvector
+# from PGDG. On 2026-11-23 it moved to the pgvector project's
+# image (Ahmed's call): a template other people deploy should
+# stand on the base its users can trust and verify, the image
+# maintained by the pgvector team itself, and the swap also
+# removes this template's own PGDG install step. Versions are
+# pinned exactly; a patch release (19.1, pgvector 0.9.0) is a
+# deliberate bump of those pins, never a silent drift.
 
-FROM postgres:19.0@sha256:d2c8a7d3d224a9c0335bf9f69ae6ad0b9aa7d88c4b64bab89f0f261332f6d4de
+FROM pgvector/pgvector:0.8.7-pg19-trixie@sha256:454ef8175fbb888961034dd4fa3a5334a138b277176052d32ab081ddc4d9f722
 
-# pgvector from PGDG, pinned exactly. The official image already
-# trusts the PGDG repository; no key or source setup is needed.
 # curl, openssl and ca-certificates serve the template's own
 # extras: TLS certificate generation and dump downloads.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        postgresql-19-pgvector=0.8.7-1.pgdg13+2 \
         curl openssl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 

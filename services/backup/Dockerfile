@@ -4,7 +4,7 @@
 # is always the same major version as the server it dumps. The
 # AWS CLI uploads each dump to the template's Railway Bucket,
 # which is S3-compatible storage inside the project.
-FROM postgres:19.0@sha256:d2c8a7d3d224a9c0335bf9f69ae6ad0b9aa7d88c4b64bab89f0f261332f6d4de
+FROM pgvector/pgvector:0.8.7-pg19-trixie@sha256:454ef8175fbb888961034dd4fa3a5334a138b277176052d32ab081ddc4d9f722
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends awscli \

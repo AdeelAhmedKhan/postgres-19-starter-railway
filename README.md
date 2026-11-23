@@ -1,11 +1,11 @@
 # PostgreSQL 19 + pgvector — Railway Template
 
-PostgreSQL **19.0** with **pgvector 0.8.7** preinstalled, on the
-official PostgreSQL image with pgvector added from PGDG, the
-PostgreSQL project's own apt repository. Ready to deploy on
-Railway. Single node, SCRAM authentication, persistent volume,
-and the `vector` extension created in your database at first
-start.
+PostgreSQL **19.0** with **pgvector 0.8.7** preinstalled, on
+the pgvector project's official image: PostgreSQL 19.0 with
+pgvector built in by the team that maintains pgvector. Ready
+to deploy on Railway. Single node, SCRAM authentication,
+persistent volume, and the `vector` extension created in your
+database at first start.
 
 ## Why this exists
 
@@ -16,10 +16,14 @@ one with its own image built from **PGDG** packages, because
 Docker Hub's official `postgres` image had no 19 tags yet and
 waiting would have wasted the release window. The official tags
 landed on 20 November 2026 and the template moved onto the
-official image the same day, keeping pgvector from PGDG, which
-is also the package source the official image itself is built
-from. PostgreSQL 14 reached end of life on 12 November 2026, so
-19 is both the new-project default and the upgrade target.
+official image the same day, keeping pgvector from PGDG. On
+23 November 2026 the base moved again, to the pgvector
+project's own image, which is PostgreSQL 19.0 with pgvector
+built in by the team that maintains it: the more trustworthy
+base for a template other people deploy, and one less install
+step to go wrong. PostgreSQL 14 reached end of life on
+12 November 2026, so 19 is both the new-project default and
+the upgrade target.
 
 What is new in 19: REPACK is now a core command for online table
 rebuilds, and WAIT gives read-your-writes consistency on
@@ -29,7 +33,7 @@ nothing about those.
 
 ## What you get
 
-- PostgreSQL 19.0 (official image, pinned by tag and digest in the Dockerfile; pgvector pinned to the exact PGDG package)
+- PostgreSQL 19.0 with pgvector 0.8.7, on the pgvector project's image, pinned by tag and digest in the Dockerfile
 - pgvector 0.8.7 installed, with `CREATE EXTENSION vector`
   already run in your application database
 - SCRAM-SHA-256 password authentication; a wrong password is
@@ -50,7 +54,7 @@ nothing about those.
   verifies each archive is readable before uploading, and keeps
   the newest 14 dumps (`BACKUP_RETENTION_COUNT`).
 - A persistent volume at `/var/lib/postgresql` (the image keeps data in its versioned subdirectory, `19/docker`)
-- The official image's variable contract: `POSTGRES_USER`,
+- The standard Postgres variable contract: `POSTGRES_USER`,
   `POSTGRES_PASSWORD`, `POSTGRES_DB`
 
 ## Variables
