@@ -66,11 +66,33 @@ nothing about those.
 | `BACKUP_RETENTION_COUNT` | `14` on the backup service |
 
 Connect from another service in the same project with the
-reference variable `PGURL`, or from outside through the TCP
-proxy the template enables on port 5432. For an encrypted
+reference variable `DATABASE_URL` (the same value is also
+exposed as `PGURL`). From outside Railway, use
+`DATABASE_PUBLIC_URL`, which routes through the TCP proxy
+the template enables on port 5432. For an encrypted
 connection add `?sslmode=require` to the connection string;
 the certificate is self-signed, so `sslmode=verify-full`
-cannot validate it.
+cannot validate it. Clients set to verify-full by default
+(some drivers, including Prisma without parameters and
+psycopg) should use `sslmode=require`, or set `PG_SSL=off`
+if TLS is not needed.
+
+The vector extension is already created in your database,
+so you can go straight to work:
+
+```sql
+CREATE TABLE items (id bigserial PRIMARY KEY, embedding vector(3));
+INSERT INTO items (embedding) VALUES ('[1,2,3]'), ('[4,5,6]');
+SELECT * FROM items ORDER BY embedding <=> '[3,1,2]' LIMIT 5;
+```
+
+What runs in your project: the database, a small backup
+cron that runs `pg_dump` once a day (about a minute of
+compute), and a Railway Bucket holding the newest 14
+archives. If you only want the database, delete the
+Postgres Backup service and the Backups bucket after
+deploying; the database runs on its own and nothing else
+changes.
 
 Restoring a backup: download a dump from the bucket and run
 `pg_restore` into the target database. The backup service's
