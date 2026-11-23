@@ -40,7 +40,8 @@ nothing about those.
   rejected, verified in testing
 - TLS on by default: the server generates a self-signed
   certificate on first start (kept on the volume, so it survives
-  restarts) and accepts encrypted connections with
+  restarts, and valid for 3,650 days, so there is no renewal
+  step) and accepts encrypted connections with
   `sslmode=require`. Set `PG_SSL=off` to disable it. Plain
   connections keep working either way.
 - Optional first-boot dump import: point
