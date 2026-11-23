@@ -119,15 +119,14 @@ logs list every archive it uploads.
 
 ## Verification
 
-Local parity test, 2026-11-20, on the exact PGDG packages this
-image runs (PostgreSQL 19.0-1, pgvector 0.8.7-1): a scratch
+Local parity test, 2026-11-20, on the same versions this
+template ships (PostgreSQL 19.0, pgvector 0.8.7): a scratch
 cluster ran PostgreSQL 19.0, `CREATE EXTENSION vector` activated
 pgvector 0.8.7, a nearest-neighbour query over a `vector(3)`
 column returned the correct ordering, and a wrong password over
 TCP was rejected. The local test ran the Ubuntu PGDG packages;
-the image uses the Debian (trixie) packages from the same
-repository, which is also where the official base image gets
-its PostgreSQL.
+the shipped image is a Debian (trixie) build of the same
+PostgreSQL version.
 Base change, 2026-11-23: the image base moved from the
 official `postgres` image (with pgvector added from PGDG) to
 the pgvector project's official image,
@@ -147,6 +146,14 @@ the backup verification described below: Ahmed's call, to
 match the one service shape of Railway's own Postgres
 template and to remove the deploy flow's cron confirmation
 stop.
+Final shape verification, 2026-11-23: after the backup
+components were removed, a fresh deploy of the one service
+template was verified again end to end. The deploy needed
+no input and no configuration clicks, and an authenticated
+connection over the TCP proxy confirmed PostgreSQL 19.0,
+the `vector` extension at 0.8.7, a TLS 1.3 session, and a
+nearest-neighbour query returning the correct ordering.
+The test project was deleted afterwards.
 Live Railway verification, 2026-11-20: a fresh deploy of this
 template was verified end to end and the test project deleted
 afterwards. The deploy logs showed the init process completing
