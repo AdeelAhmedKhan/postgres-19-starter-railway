@@ -50,10 +50,13 @@ nothing about those.
   it is applied once, on the first start against an empty data
   directory. A broken dump fails the first boot loudly instead
   of leaving a half-imported database behind.
-- Scheduled backups: a small cron service runs `pg_dump` daily
-  at 03:15 UTC into a Railway Bucket in the same project,
-  verifies each archive is readable before uploading, and keeps
-  the newest 14 dumps (`BACKUP_RETENTION_COUNT`).
+- Optional scheduled backups: this repo includes a small
+  add-on service (`services/backup/`) you can deploy
+  alongside the database. It runs `pg_dump` daily at 03:15
+  UTC into a Railway Bucket, verifies each archive is
+  readable before uploading, and keeps the newest 14 dumps
+  (`BACKUP_RETENTION_COUNT`). It is not part of the template
+  deploy itself.
 - A persistent volume at `/var/lib/postgresql` (the image keeps data in its versioned subdirectory, `19/docker`)
 - The standard Postgres variable contract: `POSTGRES_USER`,
   `POSTGRES_PASSWORD`, `POSTGRES_DB`
@@ -68,7 +71,7 @@ nothing about those.
 | `PG_SSL` | `on` by default; `off` disables TLS |
 | `POSTGRES_INIT_DUMP_URL` | Optional; empty means no import |
 | `POSTGRES_INIT_DUMP_BASE64` | Optional; empty means no import |
-| `BACKUP_RETENTION_COUNT` | `14` on the backup service |
+| `BACKUP_RETENTION_COUNT` | `14` on the optional backup add-on |
 
 Connect from another service in the same project with the
 reference variable `DATABASE_URL` (the same value is also
@@ -91,30 +94,26 @@ INSERT INTO items (embedding) VALUES ('[1,2,3]'), ('[4,5,6]');
 SELECT * FROM items ORDER BY embedding <=> '[3,1,2]' LIMIT 5;
 ```
 
-What runs in your project: the database, a small backup
-cron that runs `pg_dump` once a day (about a minute of
-compute), and a Railway Bucket holding the newest 14
-archives. If you only want the database, delete the
-Postgres Backup service and the Backups bucket after
-deploying; the database runs on its own and nothing else
-changes.
+What runs in your project: one service, the database, with
+its persistent volume. Nothing else runs unless you add it.
 
-Restoring a backup: download a dump from the bucket and run
-`pg_restore` into the target database. The backup service's
+Restoring an add-on backup: download a dump from the bucket
+and run `pg_restore` into the target database. The add-on's
 logs list every archive it uploads.
 
 ## Honest scope
 
 - Single node. No replication, high availability, or failover.
-- Backups are scheduled `pg_dump` archives, **not**
-  point-in-time recovery: a restore lands at the moment of the
-  dump, not at an arbitrary moment between dumps.
+- The optional backup add-on produces scheduled `pg_dump`
+  archives, **not** point-in-time recovery: a restore lands
+  at the moment of the dump, not at an arbitrary moment
+  between dumps.
 - TLS uses a self-signed certificate, the same trade Railway's
   own SSL Postgres image makes. It encrypts traffic; it does
   not prove the server's identity to a verifying client.
 - No major-version auto upgrade. Moving to a future major
-  version is a dump and restore; the scheduled backups make
-  that a routine operation rather than an emergency.
+  version is a dump and restore; the optional backup add-on
+  makes that a routine operation rather than an emergency.
 - Patch releases (19.1 and later) arrive when the version pins
   in the Dockerfile are bumped, not silently. Watch the repo.
 
@@ -140,7 +139,14 @@ nearest-neighbour query returning the correct ordering, an
 `sslmode=require` connection negotiating TLS 1.3
 (`pg_stat_ssl`), a wrong password rejected, and a manual
 backup run producing a verified dump in the project bucket.
-The test project was deleted afterwards.
+The test project was deleted afterwards. Later on
+2026-11-23 the backup service and bucket were removed from
+the template itself and kept in this repo as an optional
+add-on under `services/backup`, the same code that passed
+the backup verification described below: Ahmed's call, to
+match the one service shape of Railway's own Postgres
+template and to remove the deploy flow's cron confirmation
+stop.
 Live Railway verification, 2026-11-20: a fresh deploy of this
 template was verified end to end and the test project deleted
 afterwards. The deploy logs showed the init process completing

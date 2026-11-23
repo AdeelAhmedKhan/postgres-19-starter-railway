@@ -58,7 +58,12 @@ standalone PG19 on the marketplace.
   count, archive verified readable before upload). Backups are
   scheduled dumps, NEVER point-in-time recovery, and the
   feature may only be claimed after a restore drill passes on a
-  live deploy. Auto upgrade stays out until the PostgreSQL 20
+  live deploy. REMOVED from the template 2026-11-23 (Ahmed's
+  call): the backup service and bucket are no longer template
+  components; they remain in `services/backup/` as an optional
+  add-on a user can deploy alongside. The template is the
+  database alone, matching the official template's one service
+  shape and removing the deploy flow's cron confirmation stop. Auto upgrade stays out until the PostgreSQL 20
   cycle; the upgrade path is dump and restore.
 - Volume: `/var/lib/postgresql`. Since PostgreSQL 18 the
   official image keeps data in a major-version subdirectory

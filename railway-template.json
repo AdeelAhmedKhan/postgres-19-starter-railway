@@ -1,11 +1,11 @@
 {
- "_note": "Transcription of the exact Railway Template Composer settings for the PostgreSQL 19 + pgvector template. Railway does NOT read this file automatically: enter these settings in the Template Composer when publishing, and check the published page against this file. The Postgres service builds from the GitHub repo's Dockerfile, which uses the pgvector project's official image (pgvector/pgvector:0.8.7-pg19-trixie, pinned by digest): PostgreSQL 19.0 with pgvector 0.8.7 built in. The Backup service builds from services/backup/Dockerfile in the same repo.",
+ "_note": "Transcription of the exact Railway Template Composer settings for the PostgreSQL 19 + pgvector template. Railway does NOT read this file automatically: enter these settings in the Template Composer when publishing, and check the published page against this file. The Postgres service builds from the GitHub repo's Dockerfile, which uses the pgvector project's official image (pgvector/pgvector:0.8.7-pg19-trixie, pinned by digest): PostgreSQL 19.0 with pgvector 0.8.7 built in. The template is the database alone. Scheduled backups are an optional add-on in services/backup in the same repo; they shipped inside the template until 2026-11-23, when Ahmed removed them to match the one-service shape of Railway's own Postgres template and to remove the deploy flow's cron confirmation stop.",
  "category": "Storage",
  "category_note": "Railway's category list has no 'Database' option (checked 2026-11-03); Storage is the closest available filing.",
- "description": "PostgreSQL 19 + pgvector, with SSL and scheduled backups",
+ "description": "PostgreSQL 19 + pgvector with SSL on by default",
  "name": "PostgreSQL 19 + pgvector",
  "notIncluded": [
-  "Point-in-time recovery (backups are scheduled pg_dump archives; a restore lands at backup time, not at an arbitrary moment)",
+  "Point-in-time recovery (the optional backup add-on produces scheduled pg_dump archives; a restore lands at dump time, not at an arbitrary moment)",
   "Replication / high availability / automatic failover",
   "Major-version auto upgrade (moving to a future major version is a dump and restore)",
   "App code or drivers"
@@ -28,6 +28,14 @@
    },
    "type": "database",
    "variables": {
+    "DATABASE_PUBLIC_URL": {
+     "note": "Public connection string through the TCP proxy, for tools outside Railway. Mirrors the naming of Railway's own Postgres template.",
+     "value": "postgres://${{Postgres.POSTGRES_USER}}:${{Postgres.POSTGRES_PASSWORD}}@${{Postgres.RAILWAY_TCP_PROXY_DOMAIN}}:${{Postgres.RAILWAY_TCP_PROXY_PORT}}/${{Postgres.POSTGRES_DB}}"
+    },
+    "DATABASE_URL": {
+     "note": "The standard connection string name, added 2026-11-23. Same value as PGURL. Apps, ORMs and tutorials expect DATABASE_URL; the template originally exposed only PGURL, which made the standard wiring find nothing.",
+     "value": "postgres://${{Postgres.POSTGRES_USER}}:${{Postgres.POSTGRES_PASSWORD}}@${{Postgres.RAILWAY_PRIVATE_DOMAIN}}:5432/${{Postgres.POSTGRES_DB}}"
+    },
     "PGDATABASE": {
      "note": "Railway reference variable.",
      "value": "${{Postgres.POSTGRES_DB}}"
@@ -73,14 +81,6 @@
     },
     "POSTGRES_USER": {
      "value": "postgres"
-    },
-    "DATABASE_URL": {
-     "value": "postgres://${{Postgres.POSTGRES_USER}}:${{Postgres.POSTGRES_PASSWORD}}@${{Postgres.RAILWAY_PRIVATE_DOMAIN}}:5432/${{Postgres.POSTGRES_DB}}",
-     "note": "The standard connection string name, added 2026-11-23. Same value as PGURL. Apps, ORMs and tutorials expect DATABASE_URL; the template originally exposed only PGURL, which made the standard wiring find nothing."
-    },
-    "DATABASE_PUBLIC_URL": {
-     "value": "postgres://${{Postgres.POSTGRES_USER}}:${{Postgres.POSTGRES_PASSWORD}}@${{Postgres.RAILWAY_TCP_PROXY_DOMAIN}}:${{Postgres.RAILWAY_TCP_PROXY_PORT}}/${{Postgres.POSTGRES_DB}}",
-     "note": "Public connection string through the TCP proxy, for tools outside Railway. Mirrors the naming of Railway's own Postgres template."
     }
    },
    "volumes": [
@@ -89,53 +89,9 @@
      "note": "Persistent volume. Since PostgreSQL 18 the official image keeps data in a major-version subdirectory (19/docker) under this mount; mounting at the old /var/lib/postgresql/data path makes the entrypoint refuse to start (proven by live test 2026-11-20). Without the volume, data is lost on redeploy. The TLS certificate also lives on this volume (certs/ next to the data directory)."
     }
    ]
-  },
-  {
-   "cronSchedule": {
-    "note": "Daily at 03:15 UTC.",
-    "value": "15 3 * * *"
-   },
-   "name": "Postgres Backup",
-   "source": {
-    "dockerfilePath": "services/backup/Dockerfile",
-    "note": "Builds the backup image (same pinned postgres:19.0 base plus the AWS CLI) from the same repo.",
-    "repo": "AdeelAhmedKhan/postgres-19-starter-railway"
-   },
-   "type": "cron",
-   "variables": {
-    "BACKUP_RETENTION_COUNT": {
-     "note": "How many dumps to keep in the bucket; older ones are pruned after each run.",
-     "value": "14"
-    },
-    "BUCKET_ACCESS_KEY_ID": {
-     "note": "Bucket credential, wired from the Backups bucket in the Composer (references as set 2026-11-20).",
-     "value": "${{Backups.ACCESS_KEY_ID}}"
-    },
-    "BUCKET_ENDPOINT": {
-     "note": "Bucket S3 endpoint, wired from the Backups bucket in the Composer.",
-     "value": "${{Backups.ENDPOINT}}"
-    },
-    "BUCKET_NAME": {
-     "note": "Bucket name, wired from the Backups bucket in the Composer as ${{Backups.BUCKET}}: Railway's BUCKET variable is the globally unique S3 bucket name (display name plus a short hash). Do NOT use RAILWAY_BUCKET_NAME here: Railway's docs warn it is the display name, not the S3 API name, and wiring it made every upload fail with NoSuchBucket (proven live 2026-11-20 in test-pg19-f1).",
-     "value": "${{Backups.BUCKET}}"
-    },
-    "BUCKET_SECRET_ACCESS_KEY": {
-     "note": "Bucket credential, wired from the Backups bucket in the Composer.",
-     "value": "${{Backups.SECRET_ACCESS_KEY}}"
-    },
-    "DATABASE_URL": {
-     "note": "Private-network connection string for the Postgres service.",
-     "value": "postgres://${{Postgres.POSTGRES_USER}}:${{Postgres.POSTGRES_PASSWORD}}@${{Postgres.RAILWAY_PRIVATE_DOMAIN}}:5432/${{Postgres.POSTGRES_DB}}"
-    }
-   }
-  },
-  {
-   "name": "Backups",
-   "note": "Railway Bucket (S3-compatible project storage) receiving the scheduled pg_dump archives under the pgdumps/ prefix.",
-   "type": "bucket"
   }
  ],
  "stillUntestedAtPublish": [
-  "Feature build LIVE VERIFIED 2026-11-20: TLS (TLS 1.3 over sslmode=require through the public proxy), first-boot dump import (imported table and row confirmed by query), and scheduled backups (repeated successful cron runs into the bucket, plus a passed restore drill: newest dump downloaded and pg_restore'd into a fresh database with the planted data and the vector extension working). Three live-found defects were fixed on the way: import connects over the local socket during init, the password generator uses a URL-safe alphabet, and BUCKET_NAME is wired from the bucket's BUCKET variable (the real S3 name), not RAILWAY_BUCKET_NAME (the display name). Not included and not claimed: point-in-time recovery and major-version auto upgrade."
+  "Feature build LIVE VERIFIED 2026-11-20 and re-verified on the pgvector image base 2026-11-23: TLS (TLS 1.3 over sslmode=require through the public proxy) and first-boot dump import (imported table and row confirmed by query). Scheduled backups were also live verified, with repeated successful runs and a passed restore drill, while they shipped in the template; on 2026-11-23 they moved to the optional add-on in services/backup. Not included and not claimed: point-in-time recovery and major-version auto upgrade."
  ]
 }
