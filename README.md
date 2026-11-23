@@ -128,6 +128,18 @@ TCP was rejected. The local test ran the Ubuntu PGDG packages;
 the image uses the Debian (trixie) packages from the same
 repository, which is also where the official base image gets
 its PostgreSQL.
+Base change, 2026-11-23: the image base moved from the
+official `postgres` image (with pgvector added from PGDG) to
+the pgvector project's official image,
+`pgvector/pgvector:0.8.7-pg19-trixie`, pinned by digest. A
+fresh deploy of the template on the new base was verified
+the same day: PostgreSQL 19.0 (Debian 19.0-1.pgdg13+1), the
+`vector` extension at 0.8.7 already created, a
+nearest-neighbour query returning the correct ordering, an
+`sslmode=require` connection negotiating TLS 1.3
+(`pg_stat_ssl`), a wrong password rejected, and a manual
+backup run producing a verified dump in the project bucket.
+The test project was deleted afterwards.
 Live Railway verification, 2026-11-20: a fresh deploy of this
 template was verified end to end and the test project deleted
 afterwards. The deploy logs showed the init process completing
