@@ -29,7 +29,7 @@
 # init and volume contracts are the same throughout.
 #
 # This Dockerfile is the build source for the prebuilt image
-# ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0, built by
+# ghcr.io/ninja-templates/postgres-19-pgvector:19.0, built by
 # GitHub Actions; the Railway template references that image,
 # not a repo build. Bump rule: when pgvector 0.9.0 lands,
 # bump the pgvector pin below, rebuild the image, retest

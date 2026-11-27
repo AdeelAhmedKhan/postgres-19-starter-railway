@@ -27,7 +27,7 @@ step to go wrong. On 27 November 2026 the base moved back
 to the official `postgres:19.0` image plus pgvector 0.8.7
 from PGDG, on Ahmed's call: he prefers the official base
 image. The template now deploys a prebuilt image,
-`ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0`, built by
+`ghcr.io/ninja-templates/postgres-19-pgvector:19.0`, built by
 GitHub Actions from this repo's Dockerfile. PostgreSQL 14 reached end of life on
 12 November 2026, so 19 is both the new-project default and
 the upgrade target.
@@ -45,7 +45,7 @@ nothing about those.
   Dockerfile) plus pgvector 0.8.7 from PGDG, the PostgreSQL
   project's own apt repository
 - Deploys from a prebuilt image,
-  `ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0`, built by
+  `ghcr.io/ninja-templates/postgres-19-pgvector:19.0`, built by
   GitHub Actions from this repo's Dockerfile; no build runs
   at deploy time
 - pgvector 0.8.7 installed for AI work (vector search,
@@ -139,7 +139,7 @@ Base change, 2026-11-27: the image base moved back to the
 official `postgres:19.0` image plus pgvector 0.8.7 from PGDG
 (Ahmed's call: he prefers the official base image), and the
 template now deploys the prebuilt image
-`ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0`, built by
+`ghcr.io/ninja-templates/postgres-19-pgvector:19.0`, built by
 GitHub Actions from this repo's Dockerfile. This new base was
 live-verified the same day: a fresh deploy of the prebuilt
 image on Railway confirmed PostgreSQL 19.0, pgvector 0.8.7,
