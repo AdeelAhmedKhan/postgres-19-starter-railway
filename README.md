@@ -140,10 +140,14 @@ official `postgres:19.0` image plus pgvector 0.8.7 from PGDG
 (Ahmed's call: he prefers the official base image), and the
 template now deploys the prebuilt image
 `ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0`, built by
-GitHub Actions from this repo's Dockerfile. This new base is
-NOT live-verified yet. Everything below describes the
-previous base. A fresh live deploy and retest of the new base
-are required before the template is updated.
+GitHub Actions from this repo's Dockerfile. This new base was
+live-verified the same day: a fresh deploy of the prebuilt
+image on Railway confirmed PostgreSQL 19.0, pgvector 0.8.7,
+a TLS 1.3 session over `sslmode=require`, a nearest-neighbour
+query returning the correct ordering, and an identical
+re-probe after a service restart. The test project was
+deleted afterwards. Everything below describes the previous
+base.
 
 Local parity test, 2026-11-20, on the same versions this
 template ships (PostgreSQL 19.0, pgvector 0.8.7): a scratch

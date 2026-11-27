@@ -36,17 +36,20 @@ standalone PG19 on the marketplace.
 - Prebuilt image: this Dockerfile is the build source for
   `ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0`, built by
   GitHub Actions; the Railway template references that image,
-  not a repo build. The image digest is not known until the
-  first build reports it: put the tag in the Composer, add the
-  digest pin once the build reports it, never invent one.
+  not a repo build. First build 2026-11-27, image digest
+  `sha256:b88e68bfa65fc967e38a68edaa446f79f91303a6b585006146e814fb017f168f`,
+  pinned in the Composer the same day.
   Bump rule: when pgvector 0.9.0 lands, bump the pgvector pin
   in the Dockerfile, rebuild the image, retest live, then
   update the template's image digest. A patch release (19.1)
   is a bump of the base pin the same way.
-- The new official-image base is NOT live-verified yet
-  (2026-11-27): a fresh live deploy and retest are required
-  before the template is updated in the Composer. Do not
-  claim the new base is verified until that deploy passes.
+- The new official-image base was LIVE VERIFIED 2026-11-27:
+  fresh deploy of the prebuilt image on Railway (test project
+  test-pg19-image, deleted after) confirmed PostgreSQL 19.0,
+  pgvector 0.8.7, TLS 1.3 over sslmode=require, a kNN query
+  returning the correct ordering, and an identical re-probe
+  after a service restart. The template was switched to the
+  image in the Composer the same day.
 - History: the template first shipped on 2026-11-20 with its own
   `debian:trixie-slim` + PGDG image, because the official image
   did not exist when PG19 went GA on 19 Nov 2026 (Ahmed's
