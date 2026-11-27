@@ -1,11 +1,13 @@
 # PostgreSQL 19 + pgvector — Railway Template
 
-PostgreSQL **19.0** with **pgvector 0.8.7** preinstalled, on
-the pgvector project's official image: PostgreSQL 19.0 with
-pgvector built in by the team that maintains pgvector. Ready
-to deploy on Railway. Single node, SCRAM authentication,
-persistent volume, and the `vector` extension created in your
-database at first start.
+PostgreSQL **19.0** with **builtin pgvector support for AI
+work**: pgvector 0.8.7 is included for AI workloads, vector
+search, and embeddings, and the `vector` extension is created
+in your database at first start. Plain Postgres use is
+completely unaffected: if you never touch the vector
+extension, this is simply PostgreSQL 19 with TLS on by
+default. Ready to deploy on Railway. Single node, SCRAM
+authentication, persistent volume.
 
 ## Why this exists
 
@@ -21,7 +23,12 @@ official image the same day, keeping pgvector from PGDG. On
 project's own image, which is PostgreSQL 19.0 with pgvector
 built in by the team that maintains it: the more trustworthy
 base for a template other people deploy, and one less install
-step to go wrong. PostgreSQL 14 reached end of life on
+step to go wrong. On 27 November 2026 the base moved back
+to the official `postgres:19.0` image plus pgvector 0.8.7
+from PGDG, on Ahmed's call: he prefers the official base
+image. The template now deploys a prebuilt image,
+`ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0`, built by
+GitHub Actions from this repo's Dockerfile. PostgreSQL 14 reached end of life on
 12 November 2026, so 19 is both the new-project default and
 the upgrade target.
 
@@ -33,9 +40,18 @@ nothing about those.
 
 ## What you get
 
-- PostgreSQL 19.0 with pgvector 0.8.7, on the pgvector project's image, pinned by tag and digest in the Dockerfile
-- pgvector 0.8.7 installed, with `CREATE EXTENSION vector`
-  already run in your application database
+- PostgreSQL 19.0 with pgvector 0.8.7, on the official
+  `postgres:19.0` image (pinned by tag and digest in the
+  Dockerfile) plus pgvector 0.8.7 from PGDG, the PostgreSQL
+  project's own apt repository
+- Deploys from a prebuilt image,
+  `ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0`, built by
+  GitHub Actions from this repo's Dockerfile; no build runs
+  at deploy time
+- pgvector 0.8.7 installed for AI work (vector search,
+  embeddings), with `CREATE EXTENSION vector` already run in
+  your application database. If you don't need vectors,
+  ignore it: plain Postgres works exactly as usual
 - SCRAM-SHA-256 password authentication; a wrong password is
   rejected, verified in testing
 - TLS on by default: the server generates a self-signed
@@ -118,6 +134,16 @@ logs list every archive it uploads.
   in the Dockerfile are bumped, not silently. Watch the repo.
 
 ## Verification
+
+Base change, 2026-11-27: the image base moved back to the
+official `postgres:19.0` image plus pgvector 0.8.7 from PGDG
+(Ahmed's call: he prefers the official base image), and the
+template now deploys the prebuilt image
+`ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0`, built by
+GitHub Actions from this repo's Dockerfile. This new base is
+NOT live-verified yet. Everything below describes the
+previous base. A fresh live deploy and retest of the new base
+are required before the template is updated.
 
 Local parity test, 2026-11-20, on the same versions this
 template ships (PostgreSQL 19.0, pgvector 0.8.7): a scratch

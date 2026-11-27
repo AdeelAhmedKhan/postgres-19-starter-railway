@@ -23,14 +23,30 @@ standalone PG19 on the marketplace.
 
 ## Stack (pinned — do not bump majors casually)
 
-- PostgreSQL **19.0** + **pgvector 0.8.7**. Base is the pgvector
-  project's official image, `pgvector/pgvector:0.8.7-pg19-trixie`,
-  pinned by tag and amd64 digest
-  (sha256:454ef817...): PostgreSQL 19.0 with pgvector 0.8.7 built
-  in by the pgvector team. Ahmed's call 2026-11-23: for a template
-  other people deploy, trust beats ownership; the pgvector team's
-  image is the more trustworthy base, and the swap removes our own
-  PGDG install step.
+- PostgreSQL **19.0** + **pgvector 0.8.7**. Base is the official
+  Docker Hub image, `postgres:19.0`, pinned by tag and amd64
+  digest (sha256:3fb624f672a1cb628d0bdc0f533cffad31345421eedf16ab1f85ed1ea0d07d2e),
+  plus pgvector 0.8.7 from PGDG
+  (`postgresql-19-pgvector=0.8.7-2.pgdg13+1`, the trixie-pgdg
+  apt candidate, verified in the PGDG pool 2026-11-27).
+  Ahmed's call 2026-11-27, reversing the 2026-11-23 switch to
+  the pgvector project's image: he prefers the official base
+  image. The PostgreSQL and pgvector packages underneath are
+  the same PGDG builds either way.
+- Prebuilt image: this Dockerfile is the build source for
+  `ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0`, built by
+  GitHub Actions; the Railway template references that image,
+  not a repo build. The image digest is not known until the
+  first build reports it: put the tag in the Composer, add the
+  digest pin once the build reports it, never invent one.
+  Bump rule: when pgvector 0.9.0 lands, bump the pgvector pin
+  in the Dockerfile, rebuild the image, retest live, then
+  update the template's image digest. A patch release (19.1)
+  is a bump of the base pin the same way.
+- The new official-image base is NOT live-verified yet
+  (2026-11-27): a fresh live deploy and retest are required
+  before the template is updated in the Composer. Do not
+  claim the new base is verified until that deploy passes.
 - History: the template first shipped on 2026-11-20 with its own
   `debian:trixie-slim` + PGDG image, because the official image
   did not exist when PG19 went GA on 19 Nov 2026 (Ahmed's
@@ -45,6 +61,11 @@ standalone PG19 on the marketplace.
   base moved again, to the pgvector project's image (same
   entrypoint lineage, so the init and volume contracts are
   unchanged); see the Stack bullet above for the rationale.
+  On 2026-11-27 the base moved back to the official image
+  plus pgvector from PGDG (Ahmed's call, reversing
+  2026-11-23: he prefers the official base image; same
+  entrypoint lineage, so the init and volume contracts are
+  unchanged).
 - No app code, no driver, no framework lives here. The code is
   the init files in `initdb.d/`, the TLS entrypoint wrapper, the
   backup service in `services/backup/`, and the local parity

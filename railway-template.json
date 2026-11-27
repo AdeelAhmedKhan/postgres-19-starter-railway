@@ -1,5 +1,5 @@
 {
- "_note": "Transcription of the exact Railway Template Composer settings for the PostgreSQL 19 + pgvector template. Railway does NOT read this file automatically: enter these settings in the Template Composer when publishing, and check the published page against this file. The Postgres service builds from the GitHub repo's Dockerfile, which uses the pgvector project's official image (pgvector/pgvector:0.8.7-pg19-trixie, pinned by digest): PostgreSQL 19.0 with pgvector 0.8.7 built in. The template is the database alone. Scheduled backups are an optional add-on in services/backup in the same repo; they shipped inside the template until 2026-11-23, when Ahmed removed them to match the one-service shape of Railway's own Postgres template and to remove the deploy flow's cron confirmation stop.",
+ "_note": "Transcription of the exact Railway Template Composer settings for the PostgreSQL 19 + pgvector template. Railway does NOT read this file automatically: enter these settings in the Template Composer when publishing, and check the published page against this file. The Postgres service uses the prebuilt image ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0, built by GitHub Actions from this repo's Dockerfile (official postgres:19.0 + PGDG pgvector 0.8.7). The image digest is NOT known yet: it comes from the first build. Put the tag in the Composer and add the digest pin once the build reports it; never invent a digest. The new official-image base is NOT live-verified yet: a fresh live deploy and retest are required before the template is updated in the Composer. The template is the database alone. Scheduled backups are an optional add-on in services/backup in the same repo; they shipped inside the template until 2026-11-23, when Ahmed removed them to match the one-service shape of Railway's own Postgres template and to remove the deploy flow's cron confirmation stop.",
  "category": "Storage",
  "category_note": "Railway's category list has no 'Database' option (checked 2026-11-03); Storage is the closest available filing.",
  "description": "PostgreSQL 19 + pgvector with SSL on by default",
@@ -19,8 +19,9 @@
    "publicNetworking": false,
    "restartPolicy": "ON_FAILURE",
    "source": {
-    "note": "Builds the repo Dockerfile (pgvector/pgvector:0.8.7-pg19-trixie base, digest pinned).",
-    "repo": "AdeelAhmedKhan/postgres-19-starter-railway"
+    "image": "ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0",
+    "imageDigest": null,
+    "note": "Prebuilt image, built by GitHub Actions from this repo's Dockerfile (official postgres:19.0, digest pinned in the Dockerfile, + PGDG pgvector 0.8.7). The digest pin goes in the Composer once the first build reports it; do not invent a digest."
    },
    "tcpProxy": {
     "applicationPort": 5432,
