@@ -1,5 +1,5 @@
 {
- "_note": "Transcription of the exact Railway Template Composer settings for the PostgreSQL 19 + pgvector template. Railway does NOT read this file automatically: enter these settings in the Template Composer when publishing, and check the published page against this file. The Postgres service uses the prebuilt image ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0, built by GitHub Actions from this repo's Dockerfile (official postgres:19.0 + PGDG pgvector 0.8.7), digest-pinned in the Composer as below. The new official-image base was LIVE VERIFIED 2026-11-27: fresh deploy of the image on Railway (test project test-pg19-image, deleted after), PostgreSQL 19.0, pgvector 0.8.7, TLS 1.3 over sslmode=require, kNN order 1,3,2, restart re-probe identical. The template is the database alone. Scheduled backups are an optional add-on in services/backup in the same repo; they shipped inside the template until 2026-11-23, when Ahmed removed them to match the one-service shape of Railway's own Postgres template and to remove the deploy flow's cron confirmation stop.",
+ "_note": "Transcription of the exact Railway Template Composer settings for the PostgreSQL 19 + pgvector template. Railway does NOT read this file automatically: enter these settings in the Template Composer when publishing, and check the published page against this file. The Postgres service uses the prebuilt image ghcr.io/ninja-templates/postgres-19-pgvector:19.0, built by GitHub Actions from this repo's Dockerfile (official postgres:19.0 + PGDG pgvector 0.8.7), digest-pinned in the Composer as below. The new official-image base was LIVE VERIFIED 2026-11-27: fresh deploy of the image on Railway (test project test-pg19-image, deleted after), PostgreSQL 19.0, pgvector 0.8.7, TLS 1.3 over sslmode=require, kNN order 1,3,2, restart re-probe identical. The template is the database alone. Scheduled backups are an optional add-on in services/backup in the same repo; they shipped inside the template until 2026-11-23, when Ahmed removed them to match the one-service shape of Railway's own Postgres template and to remove the deploy flow's cron confirmation stop.",
  "category": "Storage",
  "category_note": "Railway's category list has no 'Database' option (checked 2026-11-03); Storage is the closest available filing.",
  "description": "PostgreSQL 19 + pgvector with SSL on by default",
@@ -19,8 +19,8 @@
    "publicNetworking": false,
    "restartPolicy": "ON_FAILURE",
    "source": {
-    "image": "ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0",
-    "imageDigest": "sha256:b88e68bfa65fc967e38a68edaa446f79f91303a6b585006146e814fb017f168f",
+    "image": "ghcr.io/ninja-templates/postgres-19-pgvector:19.0",
+    "imageDigest": "sha256:20493d4e7a1d6074c36cf129060c6b0e48be5d7a69d4c57748124c1207217d7b",
     "note": "Prebuilt image, built by GitHub Actions from this repo's Dockerfile (official postgres:19.0, digest pinned in the Dockerfile, + PGDG pgvector 0.8.7). First build 2026-11-27, digest verified live against the GHCR registry API. Live-verified on Railway 2026-11-27 (fresh deploy, TLS 1.3, pgvector, restart re-probe)."
    },
    "tcpProxy": {

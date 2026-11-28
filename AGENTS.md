@@ -34,10 +34,10 @@ standalone PG19 on the marketplace.
   image. The PostgreSQL and pgvector packages underneath are
   the same PGDG builds either way.
 - Prebuilt image: this Dockerfile is the build source for
-  `ghcr.io/adeelahmedkhan/postgres-19-pgvector:19.0`, built by
+  `ghcr.io/ninja-templates/postgres-19-pgvector:19.0`, built by
   GitHub Actions; the Railway template references that image,
   not a repo build. First build 2026-11-27, image digest
-  `sha256:b88e68bfa65fc967e38a68edaa446f79f91303a6b585006146e814fb017f168f`,
+  `sha256:20493d4e7a1d6074c36cf129060c6b0e48be5d7a69d4c57748124c1207217d7b`,
   pinned in the Composer the same day.
   Bump rule: when pgvector 0.9.0 lands, bump the pgvector pin
   in the Dockerfile, rebuild the image, retest live, then
